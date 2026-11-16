@@ -1,0 +1,24 @@
+{% macro kpi_row(kpis) %}
+<section class="kpis">
+  {% for k in kpis %}
+  <div class="kpi">
+    <div class="kpi-label">{{ k.label }}</div>
+    <div class="kpi-value">{{ k.value }}</div>
+    {% if k.delta %}<div class="kpi-delta {{ k.delta.tone }}">
+      {% if k.delta.tone == 'good' %}▲{% elif k.delta.tone == 'bad' %}▼{% else %}●{% endif %} {{ k.delta.text }}</div>{% endif %}
+    {% if k.sub %}<div class="kpi-sub">{{ k.sub }}</div>{% endif %}
+  </div>
+  {% endfor %}
+</section>
+{% endmacro %}
+
+{% macro insights(items, title='Insights') %}
+<section class="card insights">
+  <h2>{{ title }}</h2>
+  <ul>{% for t in items %}<li>{{ t }}</li>{% endfor %}</ul>
+</section>
+{% endmacro %}
+
+{% macro legend(items) %}
+<ul class="legend">{% for it in items %}<li><span class="swatch" style="background:{{ it.color }}"></span>{{ it.name }}</li>{% endfor %}</ul>
+{% endmacro %}

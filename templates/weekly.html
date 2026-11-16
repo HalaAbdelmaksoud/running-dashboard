@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% from "_macros.html" import kpi_row, insights as insights_box, legend %}
+{% block title %}Weekly · Run Log{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Weekly insights</h1>
+    <p class="muted">{{ week_start.strftime('%d %b') }} – {{ week_end.strftime('%d %b %Y') }}</p>
+  </div>
+  <form class="filters" method="get" action="{{ url_for('weekly') }}">
+    <a class="btn {% if not nav.prev %}disabled{% endif %}" href="{{ url_for('weekly', week=nav.prev) if nav.prev else '#' }}" aria-label="Previous week">‹</a>
+    <label class="sr-only" for="week">Week</label>
+    <select id="week" name="week" onchange="this.form.submit()">
+      {% for o in week_options %}<option value="{{ o.value }}" {% if o.value == week_key %}selected{% endif %}>{{ o.label }}</option>{% endfor %}
+    </select>
+    <a class="btn {% if not nav.next %}disabled{% endif %}" href="{{ url_for('weekly', week=nav.next) if nav.next else '#' }}" aria-label="Next week">›</a>
+  </form>
+</div>
+
+<nav class="chips" aria-label="Filter by day">
+  <span class="chips-label">Day</span>
+  {% for c in day_chips %}
+  <a class="chip {% if c.active %}active{% endif %}" href="{{ url_for('weekly', week=week_key, day=c.key) if c.key else url_for('weekly', week=week_key) }}">{{ c.label }}</a>
+  {% endfor %}
+</nav>
+
+{% if day %}
+  {# ------------------------- single-day view ------------------------- #}
+  <div class="day-head">
+    <h2>{{ run['Date'].strftime('%A %d %B') }}</h2>
+    <span class="pill" style="--pill:{{ level_color }}">{{ run['Interval Type'] }}</span>
+  </div>
+  {{ kpi_row(kpis) }}
+  <div class="grid-2-1">
+    <section class="card">
+      <h2>Pace along the route</h2>
+      <p class="muted small">Each point is one kilometre. Dashed line = this run's average pace. Higher = faster.</p>
+      {{ chart_run }}
+    </section>
+    {{ insights_box(insights, 'How the run went') }}
+  </div>
+  <section class="card">
+    <h2>Km splits</h2>
+    <table class="table">
+      <thead><tr><th>Km</th><th class="num">Pace</th><th class="num">vs average</th><th></th></tr></thead>
+      <tbody>
+      {% for s in split_rows %}
+        <tr><td>Km {{ s.km }}</td><td class="num">{{ s.pace|pace }} /km</td>
+          <td class="num {% if s.dev < 0 %}good{% elif s.dev > 0 %}bad{% endif %}">{{ '%+d'|format(s.dev) }} s</td>
+          <td>{% if s.fast %}<span class="tag good">▲ fastest</span>{% elif s.slow %}<span class="tag bad">▼ slowest</span>{% endif %}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </section>
+{% else %}
+  {# ------------------------- whole-week view ------------------------- #}
+  {{ kpi_row(kpis) }}
+  <div class="grid-2-1">
+    <section class="card">
+      <h2>Distance per day</h2>
+      <p class="muted small">Click a bar to see that run's per-km pace.</p>
+      {{ chart_days }}
+    </section>
+    {{ insights_box(insights) }}
+  </div>
+  {% if chart_splits %}
+  <section class="card">
+    <h2>Per-km pace, every run this week</h2>
+    <p class="muted small">Flatter lines mean more even pacing. Higher = faster.</p>
+    {{ legend(legend_splits) }}
+    {{ chart_splits }}
+  </section>
+  {% endif %}
+  <div class="grid-2">
+    <section class="card">
+      <h2>Average pace by week</h2>
+      <p class="muted small">Selected week highlighted. Gaps are weeks with no runs.</p>
+      {{ chart_trend_pace }}
+    </section>
+    <section class="card">
+      <h2>Runs per week</h2>
+      <p class="muted small">Target is 3–4. Click a bar to open that week.</p>
+      {{ chart_trend_runs }}
+    </section>
+  </div>
+  <section class="card">
+    <h2>Runs this week</h2>
+    <div class="table-scroll">
+    <table class="table">
+      <thead><tr><th>Day</th><th>Interval</th><th class="num">Distance</th><th class="num">Time</th><th class="num">Pace</th>
+        <th class="num">HR avg/max</th><th class="num">kcal</th><th class="num">Elev.</th><th class="num">Variation</th><th>Notes</th></tr></thead>
+      <tbody>
+      {% for r in table %}
+        <tr>
+          <td><a href="{{ url_for('weekly', week=week_key, day=r.day_key) }}">{{ r.date.strftime('%a %d %b') }}</a></td>
+          <td><span class="pill" style="--pill:{{ level_colors[r.level] }}">{{ r.type }}</span></td>
+          <td class="num">{{ '%.1f'|format(r.km) }} km</td><td class="num">{{ r.dur|int }} min</td>
+          <td class="num">{{ r.pace|pace }}</td><td class="num">{{ r.hr|int }} / {{ r.maxhr|int }}</td>
+          <td class="num">{{ r.cal|int }}</td><td class="num">{{ r.elev|int }} m</td><td class="num">±{{ r.var|int }} s</td>
+          <td class="muted">{{ r.notes }}</td>
+        </tr>
+      {% else %}<tr><td colspan="10" class="muted">No runs this week.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </section>
+{% endif %}
+{% endblock %}

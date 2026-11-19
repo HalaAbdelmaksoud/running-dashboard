@@ -12,8 +12,8 @@
 </section>
 {% endmacro %}
 
-{% macro insights(items, title='Insights') %}
-<section class="card insights">
+{% macro insights(items, title='Insights', class_name='') %}
+<section class="card insights {{ class_name }}">
   <h2>{{ title }}</h2>
   <ul>{% for t in items %}<li>{{ t }}</li>{% endfor %}</ul>
 </section>

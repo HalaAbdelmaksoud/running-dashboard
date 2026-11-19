@@ -141,3 +141,30 @@ select { font: inherit; padding: 7px 10px; border-radius: 8px; border: 1px solid
   background: #222; color: #fff; font-size: 12.5px; box-shadow: 0 4px 16px rgba(0,0,0,.18); }
 
 .foot { text-align: center; color: var(--text-muted); font-size: 12px; padding: 0 0 24px; }
+
+.chart-board { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.monthly-board { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.compact-insights { padding: 10px 14px; }
+.compact-insights ul { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px 16px; margin-top: 4px; }
+
+@media (min-width: 1000px) {
+  .monthly-board { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .kpis { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+}
+
+@media (min-width: 901px) {
+  .wrap { gap: 10px; padding-top: 12px; padding-bottom: 20px; }
+  .topbar { padding-top: 8px; padding-bottom: 8px; }
+  .kpis { gap: 8px; }
+  .kpi { padding: 8px 10px; }
+  .kpi-value { font-size: 19px; }
+  .chart-board { gap: 10px; }
+  .chart-board > .card { padding: 10px 12px; }
+  .chart-board .small { margin-bottom: 2px; font-size: 11px; }
+  .chart-board .legend { margin: 2px 0 4px; gap: 4px 8px; font-size: 11px; }
+}
+
+@media (max-width: 900px) {
+  .chart-board { grid-template-columns: 1fr; }
+  .compact-insights ul { grid-template-columns: 1fr; }
+}

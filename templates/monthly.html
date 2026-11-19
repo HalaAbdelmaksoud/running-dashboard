@@ -19,23 +19,16 @@
 
 {{ kpi_row(kpis) }}
 
-<div class="grid-2-1">
+<div class="chart-board monthly-board">
   <section class="card">
     <h2>Pace of every run</h2>
     <p class="muted small">Dashed line = month average. Click a point to open that run's km splits.</p>
     {{ chart_month_runs }}
   </section>
-  {{ insights_box(insights) }}
-</div>
-
-<div class="grid-2">
   <section class="card"><h2>Runs per month</h2><p class="muted small">Selected month highlighted · click to switch.</p>{{ chart_runs }}</section>
   <section class="card"><h2>Distance per month (km)</h2><p class="muted small">Selected month highlighted.</p>{{ chart_km }}</section>
   <section class="card"><h2>Average pace by month</h2><p class="muted small">Higher = faster.</p>{{ chart_pace }}</section>
   <section class="card"><h2>Pace variation by month</h2><p class="muted small">Average spread of km splits. Lower = more consistent.</p>{{ chart_var }}</section>
-</div>
-
-<div class="grid-2">
   <section class="card">
     <h2>Interval type mix</h2>
     <p class="muted small">Runs per month at each interval level.</p>
@@ -46,15 +39,19 @@
     <h2>Weeks in {{ period.strftime('%B') }}</h2>
     <p class="muted small">Distance per week · click a bar to open the weekly view.</p>
     {{ chart_weeks }}
-    <table class="table compact">
-      <thead><tr><th>Week of</th><th class="num">Runs</th><th class="num">km</th><th class="num">Pace</th><th class="num">HR</th><th class="num">Variation</th></tr></thead>
-      <tbody>{% for w in week_rows %}
-        <tr><td><a href="{{ url_for('weekly', week=w.key) }}">{{ w.ws.strftime('%d %b') }}</a></td><td class="num">{{ w.runs }}</td>
-          <td class="num">{{ '%.1f'|format(w.km) }}</td><td class="num">{{ w.pace|pace }}</td>
-          <td class="num">{{ w.hr|int if w.hr == w.hr and w.hr is not none else '–' }}</td>
-          <td class="num">{% if w.var == w.var and w.var is not none %}±{{ w.var|round|int }} s{% else %}–{% endif %}</td></tr>
-      {% endfor %}</tbody>
-    </table>
   </section>
 </div>
+
+{{ insights_box(insights, 'Insights', 'compact-insights') }}
+<section class="card">
+  <table class="table compact">
+    <thead><tr><th>Week of</th><th class="num">Runs</th><th class="num">km</th><th class="num">Pace</th><th class="num">HR</th><th class="num">Variation</th></tr></thead>
+    <tbody>{% for w in week_rows %}
+      <tr><td><a href="{{ url_for('weekly', week=w.key) }}">{{ w.ws.strftime('%d %b') }}</a></td><td class="num">{{ w.runs }}</td>
+        <td class="num">{{ '%.1f'|format(w.km) }}</td><td class="num">{{ w.pace|pace }}</td>
+        <td class="num">{{ w.hr|int if w.hr == w.hr and w.hr is not none else '–' }}</td>
+        <td class="num">{% if w.var == w.var and w.var is not none %}±{{ w.var|round|int }} s{% else %}–{% endif %}</td></tr>
+    {% endfor %}</tbody>
+  </table>
+</section>
 {% endblock %}

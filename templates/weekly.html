@@ -55,23 +55,12 @@
 {% else %}
   {# ------------------------- whole-week view ------------------------- #}
   {{ kpi_row(kpis) }}
-  <div class="grid-2-1">
+  <div class="chart-board weekly-board">
     <section class="card">
       <h2>Distance per day</h2>
       <p class="muted small">Click a bar to see that run's per-km pace.</p>
       {{ chart_days }}
     </section>
-    {{ insights_box(insights) }}
-  </div>
-  {% if chart_splits %}
-  <section class="card">
-    <h2>Per-km pace, every run this week</h2>
-    <p class="muted small">Flatter lines mean more even pacing. Higher = faster.</p>
-    {{ legend(legend_splits) }}
-    {{ chart_splits }}
-  </section>
-  {% endif %}
-  <div class="grid-2">
     <section class="card">
       <h2>Average pace by week</h2>
       <p class="muted small">Selected week highlighted. Gaps are weeks with no runs.</p>
@@ -82,7 +71,16 @@
       <p class="muted small">Target is 3–4. Click a bar to open that week.</p>
       {{ chart_trend_runs }}
     </section>
+    {% if chart_splits %}
+    <section class="card">
+      <h2>Per-km pace, every run this week</h2>
+      <p class="muted small">Flatter lines mean more even pacing. Higher = faster.</p>
+      {{ legend(legend_splits) }}
+      {{ chart_splits }}
+    </section>
+    {% endif %}
   </div>
+  {{ insights_box(insights, 'Insights', 'compact-insights') }}
   <section class="card">
     <h2>Runs this week</h2>
     <div class="table-scroll">

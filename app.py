@@ -117,7 +117,7 @@ def weekly():
         links.append(url_for("weekly", week=week_key, day=d.strftime("%Y-%m-%d")) if r is not None else None)
     chart_days = charts.bar_chart(
         [f"{d:%a}" for d in days], km_by_day, label="Distance per day this week",
-        fmt=lambda v: f"{v:g}", tips=tips, links=links, value_labels=True, height=250, width=680)
+        fmt=lambda v: f"{v:g}", tips=tips, links=links, value_labels=True, height=145, width=520)
 
     # all runs this week overlaid: per-km pace lines
     split_series = []
@@ -130,7 +130,7 @@ def weekly():
         })
     chart_splits = charts.line_chart(
         [f"Km {i}" for i in range(1, 11)], split_series, label="Per-km pace of each run this week",
-        pace_axis=True, fmt=an.fmt_pace, y_note="min/km · faster ↑", height=300, width=1000,
+        pace_axis=True, fmt=an.fmt_pace, y_note="min/km · faster ↑", height=145, width=520,
     ) if split_series else None
     legend_splits = [{"name": f"{r['Date']:%a %d %b} · {r['Distance (km)']:.1f} km", "color": f"var(--series-{i + 1})"}
                      for i, (_, r) in enumerate(week_runs.iterrows())]
@@ -144,9 +144,9 @@ def weekly():
               "tips": [f"Week of {w:%d %b}: {an.fmt_pace(v)} /km" if not pd.isna(v) else None
                        for w, v in zip(weeks["week_start"], weeks["pace"])]}],
         label="Average pace by week", pace_axis=True, fmt=an.fmt_pace, highlight=idx,
-        label_every=3, y_note="min/km · faster ↑", height=260, width=480, links=wlinks)
+        label_every=3, y_note="min/km · faster ↑", height=145, width=520, links=wlinks)
     chart_trend_runs = charts.bar_chart(
-        wl, list(weeks["runs"]), label="Runs per week", highlight=idx, label_every=3, height=260, width=480,
+        wl, list(weeks["runs"]), label="Runs per week", highlight=idx, label_every=3, height=145, width=520,
         tips=[f"Week of {w:%d %b}: {r} runs · {k:.1f} km" for w, r, k in
               zip(weeks["week_start"], weeks["runs"], weeks["km"])],
         links=wlinks)
@@ -240,32 +240,32 @@ def monthly():
     ml = [m.strftime("%b") for m in months["month"]]
     mlinks = [url_for("monthly", month=k) for k in keys]
     chart_runs = charts.bar_chart(
-        ml, list(months["runs"]), label="Runs per month", highlight=idx, value_labels=True, height=230, width=480,
+        ml, list(months["runs"]), label="Runs per month", highlight=idx, value_labels=True, height=170, width=420,
         tips=[f"{m.strftime('%B')}: {r} runs ({w:.1f}/week)" for m, r, w in
               zip(months["month"], months["runs"], months["runs_per_week"])], links=mlinks)
     chart_km = charts.bar_chart(
-        ml, list(months["km"]), label="Distance per month", highlight=idx, value_labels=True, height=230, width=480,
+        ml, list(months["km"]), label="Distance per month", highlight=idx, value_labels=True, height=170, width=420,
         fmt=lambda v: f"{v:.0f}", tips=[f"{m.strftime('%B')}: {k:.1f} km" for m, k in zip(months["month"], months["km"])],
         links=mlinks)
     chart_pace = charts.line_chart(
         ml, [{"name": "Avg pace", "values": list(months["pace"]), "color": "var(--series-1)",
               "tips": [f"{m.strftime('%B')}: {an.fmt_pace(v)} /km" for m, v in zip(months["month"], months["pace"])]}],
         label="Average pace by month", pace_axis=True, fmt=an.fmt_pace, highlight=idx,
-        y_note="min/km · faster ↑", height=230, width=480, links=mlinks)
+        y_note="min/km · faster ↑", height=170, width=420, links=mlinks)
     chart_var = charts.line_chart(
         ml, [{"name": "Variation", "values": list(months["variation"]), "color": "var(--series-2)",
               "tips": [f"{m.strftime('%B')}: ±{v:.1f} s per km" for m, v in zip(months["month"], months["variation"])]}],
         label="Pace variation by month", fmt=lambda v: f"{v:.0f} s", highlight=idx,
-        y_note="seconds · lower = more even", height=230, width=480, links=mlinks)
+        y_note="seconds · lower = more even", height=170, width=420, links=mlinks)
     matrix = [[int(r[f"level_{i}"]) for i in range(5)] for _, r in months.iterrows()]
     chart_mix = charts.stacked_bar_chart(
         ml, an.INTERVAL_LEVELS, matrix, LEVEL_COLORS, label="Interval type mix by month",
-        highlight=idx, height=250, width=480)
+        highlight=idx, height=170, width=420)
 
     # weeks inside the month
     wl = [f"{w:%d %b}" for w in mweeks["week_start"]]
     chart_weeks = charts.bar_chart(
-        wl, list(mweeks["km"]), label="Distance per week this month", value_labels=True, height=220, width=480,
+        wl, list(mweeks["km"]), label="Distance per week this month", value_labels=True, height=170, width=420,
         fmt=lambda v: f"{v:.1f}",
         tips=[f"Week of {w:%d %b}: {r} runs · {k:.1f} km · {an.fmt_pace(pc)} /km" for w, r, k, pc in
               zip(mweeks["week_start"], mweeks["runs"], mweeks["km"], mweeks["pace"])],
@@ -279,7 +279,7 @@ def monthly():
                                for _, r in mruns.iterrows()]}],
         label="Pace of every run this month", pace_axis=True, fmt=an.fmt_pace,
         ref=(cur["pace"], f"month avg {an.fmt_pace(cur['pace'])}"), y_note="min/km · faster ↑",
-        height=260, width=680, label_every=1 if len(mruns) <= 16 else 2,
+        height=170, width=420, label_every=1 if len(mruns) <= 16 else 2,
         links=[url_for("weekly", week=r["week_start"].strftime("%Y-%m-%d"), day=r["day_key"]) for _, r in mruns.iterrows()])
 
     week_rows = [{"ws": w, "key": w.strftime("%Y-%m-%d"), "runs": r, "km": k, "pace": pc, "hr": hr, "var": v}
